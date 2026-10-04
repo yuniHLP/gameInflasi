@@ -1,0 +1,1526 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>⚔️ Tarik Tambang Ekonomi — Indeks Harga & Inflasi</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Inter:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg1:#1e1b4b; --bg2:#312e81; --panel:#262253; --panel2:#2e2a63; --line:#3f3b7a;
+  --ink:#f5f3ff; --dim:#b8b3e6;
+  --a:#ef4444; --a-dark:#b91c1c;
+  --b:#3b82f6; --b-dark:#1d4ed8;
+  --c:#22c55e; --c-dark:#15803d;
+  --d:#f59e0b; --d-dark:#b45309;
+  --gold:#fbbf24;
+  --font-head:'Fredoka',sans-serif; --font-body:'Inter',sans-serif;
+}
+*{box-sizing:border-box; -webkit-touch-callout:none; user-select:none;}
+html{scroll-behavior:smooth;}
+body{
+  margin:0;min-height:100vh;font-family:var(--font-body);color:var(--ink);
+  background:radial-gradient(circle at 20% 10%,#3730a3 0%,transparent 45%),
+             radial-gradient(circle at 85% 85%,#4c1d95 0%,transparent 45%),
+             linear-gradient(160deg,var(--bg1),var(--bg2));
+  padding:16px; padding-top:calc(16px + env(safe-area-inset-top,0px));
+}
+h1,h2,h3,.font-head{font-family:var(--font-head);}
+.wrap{max-width:1400px;margin:0 auto;position:relative;z-index:2;}
+.hidden{display:none !important;}
+
+#fireworksCanvas{
+  position:fixed;
+  inset:0;
+  width:100vw;
+  height:100vh;
+  pointer-events:none;
+  z-index:90;
+}
+
+.topbar{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:16px;}
+.title{font-size:22px;font-weight:700;}
+.title span{color:var(--gold);}
+.topbar-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.scoreboard{display:flex;gap:8px;flex-wrap:wrap;}
+.score-chip{background:var(--panel);border:2px solid var(--line);border-radius:12px;padding:6px 12px;font-weight:700;font-size:13px;display:flex;align-items:center;gap:6px;}
+.score-chip .dot{width:10px;height:10px;border-radius:50%;}
+.score-chip b{font-family:var(--font-head);font-size:15px;}
+
+.util-btn{
+  background:var(--panel);border:2px solid var(--line);color:var(--ink);
+  border-radius:12px;padding:8px 14px;font-family:var(--font-head);
+  font-weight:600;font-size:13px;cursor:pointer;transition:.15s;
+  display:flex;align-items:center;gap:6px;white-space:nowrap;
+}
+.util-btn:hover{background:var(--line);border-color:var(--gold);}
+.util-btn:active{transform:scale(.96);}
+.util-btn .util-icon{font-size:15px;line-height:1;}
+.util-btn.muted{opacity:.65;}
+
+.card{background:var(--panel);border:2px solid var(--line);border-radius:22px;padding:24px;box-shadow:0 10px 30px rgba(0,0,0,.3);}
+
+.setup-title{text-align:center;margin-bottom:4px;font-size:30px;}
+.setup-sub{text-align:center;color:var(--dim);font-size:14px;margin:0 0 24px;font-weight:600;}
+.team-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:26px;}
+.team-card{border-radius:16px;padding:16px;text-align:center;border:3px solid transparent;}
+.team-card input{width:100%;text-align:center;background:rgba(0,0,0,.25);border:2px solid rgba(255,255,255,.25);border-radius:10px;padding:8px;color:#fff;font-weight:700;font-family:var(--font-head);font-size:15px;margin-top:8px;}
+.team-card .flag{font-size:34px;}
+.team-a{background:linear-gradient(160deg,var(--a),var(--a-dark));}
+.team-b{background:linear-gradient(160deg,var(--b),var(--b-dark));}
+.team-c{background:linear-gradient(160deg,var(--c),var(--c-dark));}
+.team-d{background:linear-gradient(160deg,var(--d),var(--d-dark));}
+
+.match-select{display:flex;align-items:center;justify-content:center;gap:18px;flex-wrap:wrap;margin-bottom:24px;}
+.match-select select{background:var(--panel2);color:var(--ink);border:2px solid var(--line);border-radius:12px;padding:12px 16px;font-family:var(--font-head);font-weight:600;font-size:16px;min-width:160px;}
+.vs-badge{font-family:var(--font-head);font-size:22px;color:var(--gold);}
+
+/* ===== CUSTOM SETTINGS (Jumlah Soal & Waktu Total) ===== */
+.custom-section{
+  background:linear-gradient(160deg, rgba(251,191,36,.08), rgba(251,191,36,.02));
+  border:2px solid rgba(251,191,36,.45);
+  border-radius:18px;
+  padding:20px 22px;
+  margin-bottom:24px;
+}
+.custom-header{
+  display:flex;align-items:center;gap:10px;
+  font-family:var(--font-head);font-weight:700;font-size:16px;
+  color:var(--gold);margin-bottom:16px;
+  letter-spacing:.4px;
+}
+.custom-header .ch-icon{font-size:20px;}
+.custom-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:16px;
+  margin-bottom:14px;
+}
+.custom-field{
+  display:flex;flex-direction:column;gap:8px;
+}
+.custom-field label{
+  font-family:var(--font-head);font-weight:600;font-size:13.5px;
+  color:var(--ink);letter-spacing:.2px;
+  display:flex;align-items:center;gap:6px;
+}
+.custom-field label .cf-icon{font-size:16px;}
+.custom-input-wrap{
+  display:flex;align-items:center;gap:10px;
+}
+.custom-field input[type=number]{
+  flex:1;
+  background:#1a173f;color:var(--gold);
+  border:2px solid var(--line);border-radius:12px;
+  padding:12px 14px;font-family:var(--font-head);font-weight:700;
+  font-size:22px;text-align:center;transition:.15s;
+  min-width:0;
+}
+.custom-field input[type=number]:focus{
+  outline:none;border-color:var(--gold);
+  box-shadow:0 0 0 4px rgba(251,191,36,.2);
+  background:#221d55;
+}
+.custom-field .unit{
+  font-family:var(--font-head);font-weight:600;font-size:14px;
+  color:var(--dim);white-space:nowrap;
+}
+.custom-hint{
+  font-size:11.5px;color:var(--dim);font-weight:600;
+}
+.custom-info{
+  background:rgba(34,197,94,.12);
+  border:2px solid rgba(34,197,94,.5);
+  border-radius:12px;
+  padding:12px 16px;
+  text-align:center;
+  font-family:var(--font-head);
+  font-weight:700;
+  font-size:14.5px;
+  color:#86efac;
+  letter-spacing:.3px;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  transition:.2s;
+}
+.custom-info.warn{
+  background:rgba(251,191,36,.12);
+  border-color:rgba(251,191,36,.55);
+  color:#fde68a;
+}
+.custom-info.danger{
+  background:rgba(239,68,68,.12);
+  border-color:rgba(239,68,68,.55);
+  color:#fca5a5;
+}
+.custom-info .ci-icon{font-size:18px;}
+
+/* Mode selector */
+.mode-section{margin-bottom:24px;}
+.mode-section h3{text-align:center;font-size:15px;margin:0 0 12px;color:var(--dim);}
+.mode-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.mode-card{background:var(--panel2);border:3px solid var(--line);border-radius:16px;padding:16px 18px;cursor:pointer;transition:.15s;}
+.mode-card:hover{border-color:var(--gold);}
+.mode-card.selected{border-color:var(--gold);background:linear-gradient(160deg,rgba(251,191,36,.18),var(--panel2));}
+.mode-card .mtitle{font-family:var(--font-head);font-weight:600;font-size:16px;margin-bottom:4px;display:flex;align-items:center;gap:8px;}
+.mode-card .mdesc{font-size:12px;color:var(--dim);line-height:1.6;}
+.mode-card .check{display:inline-block;width:18px;height:18px;border-radius:50%;border:2px solid var(--dim);margin-right:4px;}
+.mode-card.selected .check{background:var(--gold);border-color:var(--gold);}
+
+.rules-box{background:var(--panel2);border:2px dashed var(--line);border-radius:14px;padding:16px 18px;margin-bottom:22px;font-size:13px;color:var(--dim);line-height:1.8;}
+.rules-box b{color:var(--ink);}
+
+.btn{font-family:var(--font-head);font-weight:600;font-size:16px;padding:14px 22px;border-radius:14px;border:none;cursor:pointer;transition:transform .1s;}
+.btn:active{transform:scale(.96);}
+.btn-start{display:block;margin:0 auto;background:linear-gradient(135deg,var(--gold),#f97316);color:#3b1d00;font-size:20px;padding:16px 40px;box-shadow:0 8px 0 #b45309;}
+.btn-ghost{background:var(--panel2);color:var(--ink);border:2px solid var(--line);}
+.btn-ghost:hover{background:var(--line);}
+
+.match-bar{display:flex;align-items:center;justify-content:center;gap:16px;margin-bottom:14px;flex-wrap:wrap;}
+.match-team-pill{font-family:var(--font-head);font-weight:600;font-size:16px;padding:7px 16px;border-radius:30px;color:#fff;}
+.qcounter{font-family:var(--font-head);color:var(--dim);font-size:13px;}
+.mode-tag{font-family:var(--font-head);font-size:12px;background:var(--panel2);border:2px solid var(--line);padding:5px 12px;border-radius:20px;color:var(--gold);}
+
+.track-wrap{margin-bottom:18px;}
+.track{position:relative;height:70px;border-radius:40px;background:repeating-linear-gradient(90deg,#8b5a2b 0 14px,#a9713a 14px 28px);border:4px solid #5c3a17;overflow:visible;}
+.track-zone{position:absolute;top:0;bottom:0;width:14%;border-radius:40px;opacity:.55;}
+.track-zone.left{left:0;} .track-zone.right{right:0;}
+.track-ticks{position:absolute;inset:0;display:flex;justify-content:space-between;padding:0 6%;}
+.track-tick{width:2px;background:rgba(255,255,255,.25);}
+.flag-marker{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:38px;transition:left .5s cubic-bezier(.34,1.56,.64,1);filter:drop-shadow(0 4px 4px rgba(0,0,0,.4));}
+.track-labels{display:flex;justify-content:space-between;margin-top:6px;font-family:var(--font-head);font-weight:600;font-size:13px;color:var(--dim);}
+
+.game-layout{display:grid;gap:16px;align-items:stretch;margin-bottom:12px;}
+.game-layout.mode-serentak{grid-template-columns: minmax(240px, 1fr) minmax(340px, 1.35fr) minmax(240px, 1fr);}
+.game-layout.mode-bel{grid-template-columns: minmax(160px, 220px) minmax(340px, 1fr) minmax(160px, 220px);}
+
+.team-side{display:flex;flex-direction:column;gap:10px;}
+.team-side .inner{display:flex;flex-direction:column;gap:10px;}
+
+.center-stage{
+  background:var(--panel);border:2px solid var(--line);border-radius:22px;
+  padding:22px 20px;box-shadow:0 10px 30px rgba(0,0,0,.35);
+  display:flex;flex-direction:column;gap:14px;justify-content:flex-start;
+}
+.question-text{
+  font-size:clamp(19px, 1.9vw, 26px);font-weight:700;text-align:center;line-height:1.4;
+  min-height:80px;display:flex;align-items:center;justify-content:center;padding:4px 6px;
+}
+.timer-bar-wrap{height:10px;background:var(--panel2);border-radius:6px;overflow:hidden;margin:0 auto;max-width:520px;width:100%;}
+.timer-bar{height:100%;background:linear-gradient(90deg,#22c55e,#eab308,#ef4444);width:100%;transition:width .1s linear;}
+
+.feedback-box{text-align:center;font-family:var(--font-head);font-size:16px;min-height:24px;line-height:1.5;}
+.next-row{text-align:center;margin-top:4px;}
+
+.answer-panel{border-radius:18px;padding:14px;border:3px solid var(--line);background:var(--panel2);}
+.panel-team-name{font-family:var(--font-head);font-weight:700;font-size:16px;text-align:center;margin-bottom:10px;padding:9px;border-radius:10px;color:#fff;letter-spacing:.4px;}
+.panel-opts{display:flex;flex-direction:column;gap:10px;}
+.panel-opt-btn{
+  background:rgba(255,255,255,.06);border:2px solid var(--line);color:var(--ink);
+  border-radius:12px;padding:14px 16px;font-size:15px;font-weight:600;text-align:left;
+  cursor:pointer;min-height:60px;line-height:1.35;
+  transition:transform .08s, background .15s, border-color .15s;
+  font-family:inherit;display:flex;align-items:center;
+}
+.panel-opt-btn:active:not(:disabled){transform:scale(.97);}
+.panel-opt-btn:disabled{cursor:not-allowed;}
+.panel-opt-btn.correct{background:rgba(34,197,94,.35);border-color:var(--c);}
+.panel-opt-btn.wrong{background:rgba(239,68,68,.35);border-color:var(--a);}
+.panel-status{text-align:center;margin-top:8px;font-family:var(--font-head);font-size:13.5px;min-height:20px;font-weight:600;}
+
+.buzz-btn{
+  font-family:var(--font-head);font-weight:700;font-size:18px;
+  padding:24px 20px;border-radius:18px;color:#fff;border:none;cursor:pointer;
+  box-shadow:0 8px 0 rgba(0,0,0,.35);transition:transform .08s, box-shadow .08s;
+  width:100%;display:flex;flex-direction:column;align-items:center;gap:4px;
+  min-height:120px;justify-content:center;
+}
+.buzz-btn:active:not(:disabled){transform:translateY(5px);box-shadow:0 3px 0 rgba(0,0,0,.35);}
+.buzz-btn:disabled{opacity:.35;cursor:not-allowed;}
+.buzz-btn small{display:block;font-size:12px;font-weight:600;opacity:.9;margin-top:4px;}
+
+.turn-banner{text-align:center;font-family:var(--font-head);font-size:16px;min-height:22px;}
+.opts-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.opt-btn{
+  background:var(--panel2);border:2px solid var(--line);color:var(--ink);
+  border-radius:14px;padding:16px 16px;font-size:15px;font-weight:600;
+  text-align:left;cursor:pointer;transition:transform .1s;min-height:64px;
+  font-family:inherit;line-height:1.35;
+}
+.opt-btn:disabled{cursor:not-allowed;}
+.opt-btn.enabled:hover{border-color:var(--gold);}
+.opt-btn.correct{background:rgba(34,197,94,.3);border-color:var(--c);}
+.opt-btn.wrong{background:rgba(239,68,68,.3);border-color:var(--a);}
+
+.modal-overlay{position:fixed;inset:0;background:rgba(10,8,30,.82);display:flex;align-items:center;justify-content:center;z-index:100;padding:20px;animation:fadeIn .3s ease both;}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.modal-card{
+  position:relative;
+  background:linear-gradient(160deg,#3b2a6a,#262253 60%,#1e1b4b);
+  border:3px solid var(--gold);
+  border-radius:28px;
+  padding:40px 32px 32px;
+  text-align:center;
+  max-width:440px;
+  box-shadow:0 0 0 6px rgba(251,191,36,.15), 0 20px 60px rgba(0,0,0,.6), 0 0 100px rgba(251,191,36,.4);
+  animation:popIn .55s cubic-bezier(.34,1.56,.64,1) both, glowPulse 2s ease-in-out infinite;
+}
+@keyframes popIn{from{transform:scale(.6);opacity:0}to{transform:scale(1);opacity:1}}
+@keyframes glowPulse{
+  0%,100%{box-shadow:0 0 0 6px rgba(251,191,36,.15), 0 20px 60px rgba(0,0,0,.6), 0 0 100px rgba(251,191,36,.4);}
+  50%{box-shadow:0 0 0 10px rgba(251,191,36,.28), 0 20px 60px rgba(0,0,0,.6), 0 0 140px rgba(251,191,36,.7);}
+}
+.modal-card .trophy{
+  font-size:72px;line-height:1;animation:bounceTrophy 1.1s infinite;
+  filter:drop-shadow(0 0 20px rgba(251,191,36,.9));
+}
+@keyframes bounceTrophy{
+  0%,100%{transform:translateY(0) rotate(-3deg) scale(1);}
+  50%{transform:translateY(-14px) rotate(3deg) scale(1.08);}
+}
+.modal-card h2{
+  font-size:30px;margin:10px 0 6px;color:var(--gold);
+  text-shadow:0 0 20px rgba(251,191,36,.6);letter-spacing:.5px;
+}
+.modal-card p{color:#e0dbfa;font-size:14px;margin-bottom:24px;line-height:1.6;}
+.modal-btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;}
+
+.modal-card::before,
+.modal-card::after{
+  content:'✨';position:absolute;font-size:32px;
+  animation:spinStar 3s linear infinite;
+  filter:drop-shadow(0 0 8px rgba(251,191,36,.8));
+}
+.modal-card::before{top:-14px;left:-14px;}
+.modal-card::after{bottom:-14px;right:-14px;animation-direction:reverse;}
+@keyframes spinStar{
+  from{transform:rotate(0) scale(1);}
+  50%{transform:rotate(180deg) scale(1.3);}
+  to{transform:rotate(360deg) scale(1);}
+}
+
+footer{text-align:center;color:var(--dim);font-size:12px;padding:22px 0 6px;line-height:1.9;}
+footer .credit{font-family:var(--font-head);font-weight:600;color:var(--gold);letter-spacing:.4px;font-size:13px;}
+footer .credit span{color:var(--ink);}
+
+@media (max-width:1100px){
+  .game-layout.mode-serentak{grid-template-columns: minmax(200px, 1fr) minmax(280px, 1.2fr) minmax(200px, 1fr);gap:12px;}
+}
+@media (max-width:900px){
+  .game-layout.mode-serentak,
+  .game-layout.mode-bel{grid-template-columns: 1fr;}
+  .center-stage{order:-1;}
+  .team-side .inner{flex-direction:column;}
+  .panel-opts{display:grid;grid-template-columns:1fr 1fr;}
+}
+@media (max-width:720px){
+  .team-grid{grid-template-columns:repeat(2,1fr);}
+  .opts-grid{grid-template-columns:1fr;}
+  .mode-grid{grid-template-columns:1fr;}
+  .custom-grid{grid-template-columns:1fr;}
+  .question-text{font-size:17px;min-height:60px;}
+  .buzz-btn{min-height:80px;font-size:15px;padding:16px 12px;}
+  .title{font-size:17px;}
+  .util-btn{padding:7px 10px;font-size:12px;}
+  .modal-card .trophy{font-size:56px;}
+  .modal-card h2{font-size:24px;}
+}
+</style>
+</head>
+<body>
+
+<canvas id="fireworksCanvas"></canvas>
+
+<div class="wrap">
+
+  <div class="topbar">
+    <div class="title">⚔️ <span>Tarik Tambang Ekonomi</span></div>
+    <div class="topbar-right">
+      <div class="scoreboard" id="scoreboard"></div>
+      <button class="util-btn" id="btnSound" title="Hidup/matikan suara (tekan M)">
+        <span class="util-icon" id="soundIcon">🔊</span>
+        <span id="soundLabel">Suara</span>
+      </button>
+      <button class="util-btn" id="btnFullscreen" title="Tampilkan layar penuh (tekan F)">
+        <span class="util-icon" id="fsIcon">⛶</span>
+        <span id="fsLabel">Fullscreen</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ===================== SETUP SCREEN ===================== -->
+  <div id="screen-setup" class="card">
+    <h1 class="setup-title">Indeks Harga &amp; Inflasi</h1>
+    <p class="setup-sub">Game kuis kompetitif untuk SMA Kelas XI — siapkan tim, pilih mode, lalu mulai!</p>
+
+    <div class="team-grid" id="teamGrid"></div>
+
+    <div class="match-select">
+      <select id="selTeam1"></select>
+      <span class="vs-badge">VS</span>
+      <select id="selTeam2"></select>
+    </div>
+
+    <!-- ===== PENGATURAN CUSTOM ===== -->
+    <div class="custom-section">
+      <div class="custom-header">
+        <span class="ch-icon">⚙️</span>
+        <span>Pengaturan Permainan</span>
+      </div>
+      <div class="custom-grid">
+        <div class="custom-field">
+          <label for="inputJumlahSoal"><span class="cf-icon">🔢</span> Jumlah Soal</label>
+          <div class="custom-input-wrap">
+            <input type="number" id="inputJumlahSoal" min="5" max="40" step="1" value="15">
+            <span class="unit">soal</span>
+          </div>
+          <span class="custom-hint">Min 5 · Maks 40 soal</span>
+        </div>
+        <div class="custom-field">
+          <label for="inputWaktuTotal"><span class="cf-icon">⏱️</span> Waktu Total</label>
+          <div class="custom-input-wrap">
+            <input type="number" id="inputWaktuTotal" min="1" max="60" step="1" value="5">
+            <span class="unit">menit</span>
+          </div>
+          <span class="custom-hint">Min 1 · Maks 60 menit</span>
+        </div>
+      </div>
+      <div class="custom-info" id="customInfo">
+        <span class="ci-icon">⏳</span>
+        <span id="customInfoText">Setiap soal mendapat ± 20 detik</span>
+      </div>
+    </div>
+
+    <div class="mode-section">
+      <h3>🎮 Mode Permainan</h3>
+      <div class="mode-grid">
+        <div class="mode-card selected" id="modeCardSerentak" data-mode="serentak">
+          <div class="mtitle"><span class="check"></span>⚡ Mode Serentak</div>
+          <div class="mdesc">Kedua tim melihat soal yang sama di papan sentuh, panel jawaban <b style="color:#fbbf24">kiri untuk Tim 1</b> dan <b style="color:#fbbf24">kanan untuk Tim 2</b>, jawab kapan saja. Siapa benar lebih dulu, dialah pemenang ronde. Cocok untuk PID / desktop touchscreen.</div>
+        </div>
+        <div class="mode-card" id="modeCardBel" data-mode="bel">
+          <div class="mtitle"><span class="check"></span>🔔 Mode Bel Bergantian</div>
+          <div class="mdesc">Kedua tim berebut menekan bel dulu (tombol di kiri/kanan layar). Yang tercepat menekan bel mendapat giliran menjawab sendirian dengan durasi sama dengan waktu per soal.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="rules-box" id="rulesBox"></div>
+
+    <button class="btn btn-start" id="btnStartRound">🚀 MULAI RONDE!</button>
+  </div>
+
+  <!-- ===================== GAME SCREEN ===================== -->
+  <div id="screen-game" class="hidden">
+    <div class="match-bar">
+      <span class="match-team-pill" id="pillTeam1"></span>
+      <span class="vs-badge">VS</span>
+      <span class="match-team-pill" id="pillTeam2"></span>
+      <span class="qcounter" id="qCounter">Soal 1 / 15</span>
+      <span class="mode-tag" id="modeTag"></span>
+    </div>
+
+    <div class="track-wrap">
+      <div class="track" id="track">
+        <div class="track-zone left" id="zoneLeft"></div>
+        <div class="track-zone right" id="zoneRight"></div>
+        <div class="track-ticks" id="trackTicks"></div>
+        <div class="flag-marker" id="flagMarker">🚩</div>
+      </div>
+      <div class="track-labels">
+        <span id="labelLeft">⟵ Tim A</span>
+        <span id="labelRight">Tim B ⟶</span>
+      </div>
+    </div>
+
+    <div id="gameLayout" class="game-layout mode-serentak">
+
+      <div class="team-side left-side">
+        <div id="leftSerentak" class="inner">
+          <div class="answer-panel p1" id="panelTeam1">
+            <div class="panel-team-name" id="panelName1"></div>
+            <div class="panel-opts" id="optsGrid1"></div>
+            <div class="panel-status" id="status1"></div>
+          </div>
+        </div>
+        <div id="leftBel" class="hidden">
+          <button class="buzz-btn" id="buzzBtn1">🔔 BEL<small id="buzzLabel1">Tim A</small></button>
+        </div>
+      </div>
+
+      <div class="center-stage">
+        <div class="question-text" id="questionText">Memuat soal...</div>
+        <div class="timer-bar-wrap"><div class="timer-bar" id="timerBar"></div></div>
+
+        <div id="belAnswerArea" class="hidden">
+          <div class="turn-banner" id="turnBanner"></div>
+          <div class="opts-grid" id="optsGrid"></div>
+        </div>
+
+        <div class="feedback-box" id="feedbackBox"></div>
+        <div class="next-row">
+          <button class="btn btn-ghost hidden" id="btnNext">Lanjut ke Soal Berikutnya ➡️</button>
+        </div>
+      </div>
+
+      <div class="team-side right-side">
+        <div id="rightSerentak" class="inner">
+          <div class="answer-panel p2" id="panelTeam2">
+            <div class="panel-team-name" id="panelName2"></div>
+            <div class="panel-opts" id="optsGrid2"></div>
+            <div class="panel-status" id="status2"></div>
+          </div>
+        </div>
+        <div id="rightBel" class="hidden">
+          <button class="buzz-btn" id="buzzBtn2">🔔 BEL<small id="buzzLabel2">Tim B</small></button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ===================== ROUND END MODAL ===================== -->
+  <div id="modalRoundEnd" class="modal-overlay hidden">
+    <div class="modal-card">
+      <div class="trophy">🏆</div>
+      <h2 id="winnerText">Tim A Menang!</h2>
+      <p id="winnerSub">Selamat kepada tim pemenang ronde ini.</p>
+      <div class="modal-btns">
+        <button class="btn btn-start" id="btnNewRound" style="padding:12px 24px;font-size:15px;">🔄 Ronde Baru</button>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    Tarik Tambang Ekonomi · Materi Indeks Harga &amp; Inflasi · Dibuat untuk pembelajaran kelas interaktif<br>
+    <span class="credit">Created by : <span>Yuni H. L. Putri</span></span>
+  </footer>
+</div>
+
+<script>
+/* ===================== DATA TIM ===================== */
+const TEAMS = [
+  { id:'A', name:'Tim A', color:'#ef4444', dark:'#b91c1c', cls:'team-a' },
+  { id:'B', name:'Tim B', color:'#3b82f6', dark:'#1d4ed8', cls:'team-b' },
+  { id:'C', name:'Tim C', color:'#22c55e', dark:'#15803d', cls:'team-c' },
+  { id:'D', name:'Tim D', color:'#f59e0b', dark:'#b45309', cls:'team-d' },
+];
+const wins = { A:0, B:0, C:0, D:0 };
+
+/* ===================== BANK SOAL (60) ===================== */
+const QUESTION_BANK = [
+{q:"Indeks harga adalah ukuran statistik yang menunjukkan perubahan harga suatu barang/jasa dari waktu ke waktu dibandingkan dengan ...", opts:["Harga di pasar luar negeri","Harga pada tahun/waktu dasar","Harga barang substitusi","Harga bahan baku"], correct:1},
+{q:"Tahun yang dijadikan patokan/pembanding dalam perhitungan indeks harga disebut ...", opts:["Tahun anggaran","Tahun dasar","Tahun fiskal","Tahun berjalan"], correct:1},
+{q:"Indeks harga yang mengukur perubahan harga barang dan jasa yang dikonsumsi rumah tangga disebut ...", opts:["Indeks Harga Produsen (IHP)","Indeks Harga Perdagangan Besar (IHPB)","Indeks Harga Konsumen (IHK)","Indeks Harga Implisit"], correct:2},
+{q:"Angka indeks harga pada tahun dasar selalu bernilai ...", opts:["0","1","100","1000"], correct:2},
+{q:"Jika IHK tahun 2024 sebesar 115, artinya harga barang secara umum mengalami kenaikan sebesar ... dibanding tahun dasar.", opts:["15%","115%","85%","100%"], correct:0},
+{q:"Indeks Harga Konsumen di Indonesia dirilis secara resmi oleh ...", opts:["Bank Indonesia","Kementerian Keuangan","Badan Pusat Statistik (BPS)","Otoritas Jasa Keuangan"], correct:2},
+{q:"Indeks harga yang mengukur perubahan harga barang hasil produksi di tingkat produsen disebut ...", opts:["Indeks Harga Konsumen","Indeks Harga Produsen","Indeks Harga Saham","Indeks Harga Ekspor"], correct:1},
+{q:"Manfaat utama indeks harga bagi pemerintah adalah ...", opts:["Menentukan nilai tukar mata uang asing","Menjadi dasar perumusan kebijakan ekonomi, termasuk upah minimum","Menentukan jumlah penduduk","Menghitung luas wilayah negara"], correct:1},
+{q:"Jika indeks harga suatu barang pada tahun tertentu kurang dari 100, dapat disimpulkan harga barang tersebut ...", opts:["Naik dibanding tahun dasar","Turun dibanding tahun dasar","Sama dengan tahun dasar","Tidak dapat dibandingkan"], correct:1},
+{q:"Berikut yang BUKAN merupakan jenis indeks harga adalah ...", opts:["Indeks Harga Konsumen","Indeks Harga Produsen","Indeks Harga Perdagangan Besar","Indeks Prestasi Kumulatif"], correct:3},
+{q:"Indeks harga sangat berguna untuk menghitung besarnya laju ...", opts:["Pertumbuhan penduduk","Inflasi","Ekspor neto","Produksi nasional"], correct:1},
+{q:"Paket barang dan jasa yang digunakan dalam perhitungan IHK disebut ...", opts:["Basket komoditas","Keranjang pasar (market basket)","Bundel ekonomi","Portofolio konsumen"], correct:1},
+{q:"Rumus indeks harga agregatif sederhana adalah ...", opts:["IA = (ΣPn / ΣPo) × 100","IA = (ΣPo / ΣPn) × 100","IA = (ΣPn × ΣPo) × 100","IA = (ΣPn − ΣPo) × 100"], correct:0},
+{q:"Dalam rumus indeks harga, simbol 'Pn' menunjukkan ...", opts:["Harga pada tahun dasar","Harga pada tahun yang dihitung (tahun n)","Jumlah produksi","Jumlah penduduk"], correct:1},
+{q:"Metode indeks harga yang menggunakan kuantitas tahun dasar sebagai faktor penimbang disebut metode ...", opts:["Paasche","Laspeyres","Fisher","Drobisch"], correct:1},
+{q:"Metode indeks harga yang menggunakan kuantitas tahun berjalan sebagai faktor penimbang disebut metode ...", opts:["Laspeyres","Paasche","Marshall-Edgeworth","Drobisch"], correct:1},
+{q:"Rumus Indeks Laspeyres yang benar adalah ...", opts:["IL = (ΣPn·Qn / ΣPo·Qn) × 100","IL = (ΣPn·Qo / ΣPo·Qo) × 100","IL = (ΣPo·Qn / ΣPn·Qo) × 100","IL = (ΣPo·Qo / ΣPn·Qn) × 100"], correct:1},
+{q:"Rumus Indeks Paasche yang benar adalah ...", opts:["IP = (ΣPn·Qo / ΣPo·Qo) × 100","IP = (ΣPo·Qn / ΣPn·Qn) × 100","IP = (ΣPn·Qn / ΣPo·Qn) × 100","IP = (ΣPo·Qo / ΣPn·Qo) × 100"], correct:2},
+{q:"Indeks harga yang merupakan rata-rata ukur (geometris) dari Indeks Laspeyres dan Paasche disebut Indeks ...", opts:["Drobisch","Marshall-Edgeworth","Fisher","Walsh"], correct:2},
+{q:"Kelemahan utama Indeks Laspeyres adalah ...", opts:["Membutuhkan data kuantitas tiap tahun sehingga mahal","Cenderung overestimate karena mengabaikan perubahan pola konsumsi","Tidak dapat digunakan untuk data historis","Hanya berlaku untuk satu jenis barang"], correct:1},
+{q:"Kelemahan utama Indeks Paasche adalah ...", opts:["Tidak memperhitungkan harga tahun dasar","Membutuhkan data kuantitas tahun berjalan yang sulit & mahal diperoleh","Selalu sama dengan Laspeyres","Tidak dapat digunakan menghitung inflasi"], correct:1},
+{q:"Harga suatu barang pada tahun dasar Rp2.000 dan tahun berjalan Rp2.400. Indeks harga agregatif sederhananya adalah ...", opts:["83,3%","100%","120%","140%"], correct:2},
+{q:"Laju inflasi dapat dihitung dengan rumus ...", opts:["(IHKn − IHKn-1) / IHKn-1 × 100%","(IHKn + IHKn-1) / IHKn-1 × 100%","IHKn × IHKn-1 × 100%","IHKn-1 / IHKn × 100%"], correct:0},
+{q:"Jika IHK 2023 = 120 dan IHK 2024 = 126, maka laju inflasi 2024 adalah ...", opts:["4%","5%","6%","10%"], correct:1},
+{q:"Berdasarkan tingkat keparahannya, inflasi dengan laju di bawah 10% per tahun disebut ...", opts:["Inflasi ringan","Inflasi sedang","Inflasi berat","Hiperinflasi"], correct:0},
+{q:"Inflasi dengan laju antara 10%–30% per tahun termasuk kategori ...", opts:["Inflasi ringan","Inflasi sedang","Inflasi berat","Hiperinflasi"], correct:1},
+{q:"Inflasi dengan laju antara 30%–100% per tahun termasuk kategori ...", opts:["Inflasi ringan","Inflasi sedang","Inflasi berat","Hiperinflasi"], correct:2},
+{q:"Inflasi dengan laju di atas 100% per tahun, nilai uang merosot tajam, masyarakat cenderung menukar uang dengan barang, disebut ...", opts:["Inflasi ringan","Inflasi sedang","Inflasi berat","Hiperinflasi"], correct:3},
+{q:"Berdasarkan asalnya, inflasi akibat kenaikan harga barang-barang impor disebut ...", opts:["Domestic inflation","Imported inflation","Core inflation","Structural inflation"], correct:1},
+{q:"Inflasi yang penyebabnya dari dalam negeri, misalnya defisit anggaran dibiayai cetak uang, disebut ...", opts:["Domestic inflation","Imported inflation","Cost-push inflation","Demand inflation saja"], correct:0},
+{q:"Inflasi akibat kenaikan permintaan agregat melebihi kemampuan produksi disebut ...", opts:["Cost-push inflation","Demand-pull inflation","Imported inflation","Spiral inflation"], correct:1},
+{q:"Inflasi akibat kenaikan biaya produksi, misalnya harga bahan baku/upah buruh naik, disebut ...", opts:["Demand-pull inflation","Cost-push inflation","Imported inflation","Monetary inflation"], correct:1},
+{q:"Contoh pemicu cost-push inflation adalah ...", opts:["Meningkatnya permintaan menjelang hari raya","Kenaikan harga BBM yang menaikkan biaya produksi/distribusi","Masuknya investasi asing","Penurunan suku bunga bank"], correct:1},
+{q:"Contoh pemicu demand-pull inflation adalah ...", opts:["Kenaikan harga bahan bakar industri","Gagal panen yang mengurangi pasokan","Lonjakan permintaan akibat kenaikan daya beli masyarakat","Kenaikan upah minimum regional"], correct:2},
+{q:"Inflasi yang sangat cepat dan tidak terkendali, umumnya akibat pencetakan uang besar-besaran, paling mendekati jenis ...", opts:["Inflasi ringan","Inflasi sedang","Hiperinflasi","Deflasi"], correct:2},
+{q:"Kebalikan dari inflasi, yaitu penurunan harga barang secara umum dan terus-menerus, disebut ...", opts:["Stagflasi","Deflasi","Disinflasi","Reflasi"], correct:1},
+{q:"Salah satu penyebab utama inflasi menurut teori kuantitas uang adalah ...", opts:["Jumlah uang beredar bertambah lebih cepat dari pertumbuhan output","Penurunan jumlah penduduk","Peningkatan produksi barang besar-besaran","Penurunan permintaan masyarakat"], correct:0},
+{q:"Pemerintah mencetak uang baru dalam jumlah besar untuk membiayai defisit dapat memicu inflasi karena ...", opts:["Mengurangi jumlah barang di pasar","Menambah uang beredar tanpa diimbangi barang/jasa sehingga nilai uang turun","Meningkatkan nilai tukar rupiah","Menurunkan permintaan masyarakat"], correct:1},
+{q:"Kenaikan harga BBM dunia yang menaikkan biaya produksi & transportasi adalah contoh penyebab inflasi dari sisi ...", opts:["Permintaan (demand)","Penawaran/biaya produksi (supply/cost)","Nilai tukar saja","Jumlah penduduk"], correct:1},
+{q:"Melemahnya nilai tukar rupiah terhadap dolar AS dapat memicu inflasi karena ...", opts:["Harga barang & bahan baku impor jadi lebih mahal dalam rupiah","Ekspor menjadi lebih murah","Harga barang domestik otomatis turun","Tidak berpengaruh terhadap harga barang"], correct:0},
+{q:"Ekspektasi masyarakat bahwa harga akan terus naik dapat mendorong inflasi karena ...", opts:["Masyarakat menunda semua pembelian","Produsen menaikkan harga lebih dulu & pekerja menuntut kenaikan upah","Pemerintah otomatis menurunkan pajak","Bank sentral otomatis menaikkan suku bunga"], correct:1},
+{q:"Berkurangnya pasokan barang akibat gagal panen/bencana alam memicu inflasi dari sisi ...", opts:["Permintaan","Penawaran","Nilai tukar","Suku bunga"], correct:1},
+{q:"Kenaikan upah buruh yang tidak diimbangi produktivitas dapat mendorong inflasi melalui ...", opts:["Penurunan biaya produksi","Kenaikan biaya produksi yang dibebankan ke harga jual","Penurunan permintaan tenaga kerja","Peningkatan nilai tukar rupiah"], correct:1},
+{q:"Kebijakan suku bunga rendah jangka panjang dapat mendorong inflasi karena ...", opts:["Mendorong masyarakat menabung lebih banyak","Mendorong kredit & konsumsi meningkat sehingga permintaan agregat naik","Menurunkan jumlah uang beredar","Tidak berkaitan dengan inflasi"], correct:1},
+{q:"Berikut penyebab inflasi dari sisi permintaan (demand-pull) adalah ...", opts:["Kenaikan harga bahan baku impor","Peningkatan belanja pemerintah & konsumsi masyarakat besar-besaran","Gagal panen","Kenaikan tarif dasar listrik"], correct:1},
+{q:"Dampak krisis global terhadap inflasi suatu negara sering terjadi melalui jalur ...", opts:["Gangguan rantai pasok yang menaikkan biaya produksi (cost-push)","Penurunan harga minyak dunia secara permanen","Penguatan nilai tukar seluruh mata uang dunia","Penurunan jumlah uang beredar global"], correct:0},
+{q:"Defisit anggaran yang dibiayai utang luar negeri besar berpotensi memicu inflasi apabila ...", opts:["Utang digunakan untuk barang modal produktif","Pembayaran utang menekan nilai tukar rupiah sehingga barang impor naik","Utang langsung dilunasi tanpa bunga","Tidak ada pengaruh sama sekali terhadap harga"], correct:1},
+{q:"Inflasi akibat kombinasi naiknya permintaan DAN biaya produksi secara bersamaan disebut ...", opts:["Inflasi campuran (mixed inflation)","Deflasi","Disinflasi","Inflasi inti murni"], correct:0},
+{q:"Dampak inflasi terhadap masyarakat berpenghasilan tetap adalah ...", opts:["Daya beli meningkat","Daya beli menurun karena pendapatan riil berkurang","Tidak berpengaruh sama sekali","Pendapatan otomatis naik mengikuti inflasi"], correct:1},
+{q:"Pihak yang diuntungkan saat inflasi, karena nilai riil utang yang dibayarkan lebih kecil, adalah ...", opts:["Kreditur (pemberi pinjaman)","Debitur (peminjam)","Pemerintah pusat","Eksportir"], correct:1},
+{q:"Pihak yang dirugikan saat inflasi, karena nilai riil uang yang diterima kembali lebih rendah, adalah ...", opts:["Debitur","Kreditur (pemberi pinjaman)","Produsen barang ekspor","Pemerintah"], correct:1},
+{q:"Dampak inflasi terhadap daya saing ekspor suatu negara umumnya adalah ...", opts:["Ekspor meningkat karena harga naik","Ekspor menurun karena harga barang domestik lebih mahal dibanding negara lain","Tidak berpengaruh terhadap ekspor","Ekspor otomatis menjadi gratis"], correct:1},
+{q:"Inflasi tinggi dan tidak terkendali dapat menurunkan minat investasi karena ...", opts:["Investor lebih menyukai ketidakpastian ekonomi","Ketidakpastian harga membuat investor sulit membuat perhitungan bisnis jangka panjang","Inflasi selalu menurunkan suku bunga menjadi nol","Investasi tidak terkait dengan tingkat harga"], correct:1},
+{q:"Dampak positif inflasi ringan bagi produsen dapat berupa ...", opts:["Mendorong produsen meningkatkan produksi karena harga jual & keuntungan naik","Menurunkan seluruh biaya produksi","Menghapus kewajiban membayar pajak","Tidak ada dampak positif sama sekali"], correct:0},
+{q:"Salah satu dampak sosial dari inflasi tinggi adalah ...", opts:["Menurunnya kesenjangan sosial","Meningkatnya kesenjangan sosial karena kelompok berpenghasilan rendah paling dirugikan","Hilangnya seluruh jenis pekerjaan","Tidak ada dampak sosial"], correct:1},
+{q:"Hiperinflasi parah dapat menyebabkan masyarakat kehilangan kepercayaan terhadap mata uang domestik dan beralih ke ...", opts:["Mata uang asing atau barter","Semakin banyak menabung di bank domestik","Saham domestik semata","Tidak ada perubahan perilaku"], correct:0},
+{q:"Dampak inflasi terhadap tabungan masyarakat (bunga tetap di bawah laju inflasi) adalah ...", opts:["Nilai riil tabungan meningkat","Nilai riil tabungan menurun karena bunga tak mengimbangi kenaikan harga","Tidak berpengaruh pada tabungan","Tabungan otomatis dikonversi menjadi emas"], correct:1},
+{q:"Bagi pemerintah, inflasi tinggi dapat mempersulit perencanaan anggaran karena ...", opts:["Harga & biaya proyek pemerintah sulit diprediksi dan cenderung membengkak","Pajak otomatis dihapuskan","Pendapatan negara otomatis meningkat tanpa batas","Tidak ada pengaruh terhadap anggaran negara"], correct:0},
+{q:"Salah satu cara bank sentral mengendalikan dampak buruk inflasi melalui kebijakan moneter adalah ...", opts:["Menurunkan suku bunga acuan terus-menerus","Menaikkan suku bunga acuan untuk mengurangi uang beredar & permintaan","Mencetak lebih banyak uang","Menghapus pajak secara total"], correct:1},
+{q:"Secara umum, dampak inflasi ringan yang terkendali bagi perekonomian bersifat ...", opts:["Selalu merugikan tanpa pengecualian","Relatif positif karena dapat mendorong produksi & investasi, selama terkendali","Menyebabkan resesi otomatis","Tidak memiliki dampak ekonomi apa pun"], correct:1},
+];
+
+/* ===================== UTIL ===================== */
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; }
+  return a;
+}
+function prepareRoundQuestions(count){
+  const n = Math.max(1, Math.min(count, QUESTION_BANK.length));
+  const picked = shuffle(QUESTION_BANK).slice(0, n);
+  return picked.map(q => ({ text:q.q, opts:q.opts, correctIdx:q.correct }));
+}
+function shuffledOptionSet(q){
+  const objs = q.opts.map((text,i)=>({text, isCorrect:i===q.correctIdx}));
+  return shuffle(objs);
+}
+
+/* ============================================================
+   ⚙️ CUSTOM SETTINGS — Jumlah Soal & Waktu Total
+============================================================ */
+const inputJumlahSoal = document.getElementById('inputJumlahSoal');
+const inputWaktuTotal  = document.getElementById('inputWaktuTotal');
+const customInfo       = document.getElementById('customInfo');
+const customInfoText   = document.getElementById('customInfoText');
+
+function clamp(v, min, max){
+  if(isNaN(v)) return min;
+  return Math.max(min, Math.min(max, v));
+}
+
+function getCustomSettings(){
+  let qCount    = clamp(parseInt(inputJumlahSoal.value, 10), 5, 40);
+  let totalMin  = clamp(parseInt(inputWaktuTotal.value, 10), 1, 60);
+  inputJumlahSoal.value = qCount;
+  inputWaktuTotal.value  = totalMin;
+
+  const totalSec      = totalMin * 60;
+  const perQSec       = Math.max(3, Math.floor(totalSec / qCount));
+  const actualTotalSec = perQSec * qCount;
+
+  return {
+    qCount,
+    totalMin,
+    totalSec,
+    perQSec,
+    actualTotalSec,
+    totalMinActual: Math.round((actualTotalSec/60)*10)/10
+  };
+}
+
+function updateCustomInfo(){
+  const s = getCustomSettings();
+
+  // Update teks info
+  customInfoText.innerHTML =
+    `Setiap soal mendapat <b style="color:#fff">± ${s.perQSec} detik</b> ` +
+    `(${s.qCount} soal × ${s.perQSec} detik ≈ ${s.totalMinActual} menit)`;
+
+  // Warnai sesuai nilai perQSec
+  customInfo.classList.remove('warn','danger');
+  if(s.perQSec < 8){
+    customInfo.classList.add('danger');
+  } else if(s.perQSec < 15){
+    customInfo.classList.add('warn');
+  }
+
+  // Update aturan main
+  setMode(gameMode);
+}
+
+inputJumlahSoal.addEventListener('input', updateCustomInfo);
+inputJumlahSoal.addEventListener('change', updateCustomInfo);
+inputWaktuTotal.addEventListener('input', updateCustomInfo);
+inputWaktuTotal.addEventListener('change', updateCustomInfo);
+
+/* ============================================================
+   🎵 SOUND ENGINE
+============================================================ */
+let audioCtx = null;
+let soundEnabled = true;
+
+function getAudioCtx(){
+  if(!audioCtx){
+    try{ audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+    catch(e){ return null; }
+  }
+  if(audioCtx.state === 'suspended') audioCtx.resume();
+  return audioCtx;
+}
+
+function tone(freq, startOffset, dur, type='sine', vol=0.15){
+  if(!soundEnabled) return;
+  const ctx = getAudioCtx(); if(!ctx) return;
+  const t0 = ctx.currentTime + startOffset;
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.type = type;
+  osc.frequency.setValueAtTime(freq, t0);
+  gain.gain.setValueAtTime(0, t0);
+  gain.gain.linearRampToValueAtTime(vol, t0 + 0.012);
+  gain.gain.exponentialRampToValueAtTime(0.0008, t0 + dur);
+  osc.connect(gain).connect(ctx.destination);
+  osc.start(t0);
+  osc.stop(t0 + dur + 0.02);
+}
+
+function playCorrect(){
+  if(!soundEnabled) return;
+  const notes = [523.25, 659.25, 783.99, 1046.50];
+  notes.forEach((f, i) => {
+    tone(f,      i * 0.08, 0.28, 'triangle', 0.17);
+    tone(f * 2,  i * 0.08, 0.16, 'sine',     0.05);
+  });
+  tone(1568, 0.36, 0.35, 'sine', 0.10);
+  tone(2093, 0.42, 0.30, 'sine', 0.07);
+}
+
+function playWrong(){
+  if(!soundEnabled) return;
+  const ctx = getAudioCtx(); if(!ctx) return;
+  [392, 311, 247].forEach((f, i) => {
+    const t0 = ctx.currentTime + i * 0.16;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(f, t0);
+    osc.frequency.exponentialRampToValueAtTime(f * 0.75, t0 + 0.16);
+    gain.gain.setValueAtTime(0.10, t0);
+    gain.gain.exponentialRampToValueAtTime(0.001, t0 + 0.22);
+    osc.connect(gain).connect(ctx.destination);
+    osc.start(t0); osc.stop(t0 + 0.24);
+  });
+  const t0 = ctx.currentTime + 0.5;
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.type = 'sine';
+  osc.frequency.setValueAtTime(150, t0);
+  osc.frequency.exponentialRampToValueAtTime(55, t0 + 0.35);
+  gain.gain.setValueAtTime(0.18, t0);
+  gain.gain.exponentialRampToValueAtTime(0.001, t0 + 0.4);
+  osc.connect(gain).connect(ctx.destination);
+  osc.start(t0); osc.stop(t0 + 0.42);
+}
+
+function playApplause(duration = 5){
+  if(!soundEnabled) return;
+  const ctx = getAudioCtx(); if(!ctx) return;
+  const sr = ctx.sampleRate;
+  const bufferSize = Math.floor(sr * duration);
+  const buffer = ctx.createBuffer(1, bufferSize, sr);
+  const data = buffer.getChannelData(0);
+
+  for(let i=0;i<bufferSize;i++){
+    const t = i/sr;
+    const env = Math.min(1, t*3) * Math.exp(-t*0.28);
+    data[i] = (Math.random()*2-1) * 0.07 * env;
+  }
+  const claps = [];
+  for(let i=0;i<500;i++){
+    claps.push({
+      time: Math.pow(Math.random(), 0.65) * duration * 0.85,
+      amp: 0.35 + Math.random()*0.75
+    });
+  }
+  claps.sort((a,b)=>a.time-b.time);
+  for(const clap of claps){
+    const startIdx = Math.floor(clap.time * sr);
+    const clapLen = Math.floor(0.035 * sr);
+    for(let j=0;j<clapLen;j++){
+      const idx = startIdx + j;
+      if(idx >= bufferSize) break;
+      const progress = j / clapLen;
+      const clapEnv = Math.exp(-Math.pow(progress-0.05, 2) * 60) * clap.amp;
+      data[idx] += (Math.random()*2-1) * 0.55 * clapEnv;
+    }
+  }
+  [0.5, 1.4, 2.3, 3.2, 4.1].forEach(wt => {
+    if(wt > duration - 0.5) return;
+    const startIdx = Math.floor(wt * sr);
+    const wLen = Math.floor(0.35 * sr);
+    const basePitch = 1800 + Math.random()*600;
+    for(let j=0;j<wLen;j++){
+      const idx = startIdx + j;
+      if(idx >= bufferSize) break;
+      const p = j / wLen;
+      const env = Math.sin(p * Math.PI);
+      const freq = basePitch + Math.sin(p * Math.PI * 2) * 400;
+      const phase = 2 * Math.PI * freq * (j / sr);
+      data[idx] += Math.sin(phase) * 0.06 * env;
+    }
+  });
+  const cheerStart = Math.floor(0.2 * sr);
+  const cheerLen = Math.floor(1.5 * sr);
+  for(let j=0;j<cheerLen;j++){
+    const idx = cheerStart + j;
+    if(idx >= bufferSize) break;
+    const p = j / cheerLen;
+    const env = Math.sin(p * Math.PI);
+    const freq = 180 + p * 60;
+    const phase = 2 * Math.PI * freq * (j / sr);
+    data[idx] += Math.sin(phase) * 0.04 * env * (0.5 + Math.random()*0.5);
+  }
+  for(let i=0;i<bufferSize;i++) data[i] = Math.tanh(data[i] * 1.8);
+
+  const src = ctx.createBufferSource();
+  src.buffer = buffer;
+  const filter = ctx.createBiquadFilter();
+  filter.type = 'bandpass'; filter.frequency.value = 2400; filter.Q.value = 0.55;
+  const delay = ctx.createDelay(0.2); delay.delayTime.value = 0.08;
+  const delayGain = ctx.createGain(); delayGain.gain.value = 0.18;
+  const gain = ctx.createGain(); gain.gain.value = 0.85;
+  src.connect(filter);
+  filter.connect(gain);
+  filter.connect(delay);
+  delay.connect(delayGain);
+  delayGain.connect(gain);
+  gain.connect(ctx.destination);
+  src.start();
+}
+
+function playFireworkBoom(delay = 0){
+  if(!soundEnabled) return;
+  const ctx = getAudioCtx(); if(!ctx) return;
+  const t0 = ctx.currentTime + delay;
+  const osc = ctx.createOscillator(); const gain = ctx.createGain();
+  osc.type = 'sine';
+  osc.frequency.setValueAtTime(120, t0);
+  osc.frequency.exponentialRampToValueAtTime(45, t0 + 0.35);
+  gain.gain.setValueAtTime(0.22, t0);
+  gain.gain.exponentialRampToValueAtTime(0.001, t0 + 0.4);
+  osc.connect(gain).connect(ctx.destination);
+  osc.start(t0); osc.stop(t0 + 0.42);
+  for(let i=0;i<18;i++){
+    const o = ctx.createOscillator(); const g = ctx.createGain();
+    o.type = 'square';
+    o.frequency.value = 1800 + Math.random()*2400;
+    g.gain.setValueAtTime(0.035, t0 + i*0.02 + 0.15);
+    g.gain.exponentialRampToValueAtTime(0.001, t0 + i*0.02 + 0.19);
+    o.connect(g).connect(ctx.destination);
+    o.start(t0 + i*0.02 + 0.15);
+    o.stop(t0 + i*0.02 + 0.21);
+  }
+}
+
+function playBuzz(){
+  if(!soundEnabled) return;
+  tone(880, 0.00, 0.10, 'square', 0.14);
+  tone(1320, 0.06, 0.14, 'sine',   0.10);
+}
+
+function playTick(){
+  if(!soundEnabled) return;
+  tone(1600, 0, 0.05, 'square', 0.045);
+}
+
+/* ============================================================
+   🎆 KEMBANG API & CONFETTI
+============================================================ */
+const fwCanvas = document.getElementById('fireworksCanvas');
+const fwCtx = fwCanvas.getContext('2d');
+let particles = [];
+let confetti = [];
+let celebrationActive = false;
+let celebrationStart = 0;
+const CELEBRATION_DURATION = 8000;
+let lastFwSpawn = 0;
+let fwAnimId = null;
+let launchedFireworks = 0;
+const MAX_FIREWORKS = 14;
+
+function resizeFwCanvas(){
+  fwCanvas.width = window.innerWidth;
+  fwCanvas.height = window.innerHeight;
+}
+resizeFwCanvas();
+window.addEventListener('resize', resizeFwCanvas);
+
+function launchFirework(x, y, hue){
+  const h = (hue !== undefined) ? hue : Math.random() * 360;
+  const count = 90 + Math.floor(Math.random() * 60);
+  for(let i = 0; i < count; i++){
+    const angle = (Math.PI * 2 * i) / count + Math.random() * 0.4;
+    const speed = 1.5 + Math.random() * 5;
+    particles.push({
+      x, y,
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed,
+      life: 1,
+      decay: 0.008 + Math.random() * 0.012,
+      hue: h + (Math.random() - 0.5) * 60,
+      size: 1.5 + Math.random() * 2.2
+    });
+  }
+  particles.push({
+    x, y, vx:0, vy:0, life:1, decay:0.06, hue: h,
+    size: 30, flash: true
+  });
+}
+
+function spawnConfetti(count){
+  const colors = ['#ef4444','#3b82f6','#22c55e','#f59e0b','#fbbf24','#a855f7','#ec4899','#06b6d4','#fff','#fde047'];
+  for(let i = 0; i < count; i++){
+    confetti.push({
+      x: Math.random() * fwCanvas.width,
+      y: -30 - Math.random() * fwCanvas.height * 0.6,
+      w: 6 + Math.random() * 8,
+      h: 10 + Math.random() * 10,
+      vx: (Math.random() - 0.5) * 2.5,
+      vy: 1.8 + Math.random() * 3.5,
+      rot: Math.random() * Math.PI * 2,
+      rotSpeed: (Math.random() - 0.5) * 0.22,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      wobble: Math.random() * Math.PI * 2,
+      wobbleSpeed: 0.05 + Math.random() * 0.08,
+      shape: Math.random() < 0.3 ? 'star' : 'rect'
+    });
+  }
+}
+
+function drawStar(ctx, x, y, r, color){
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  for(let i = 0; i < 5; i++){
+    const a1 = (Math.PI * 2 * i) / 5 - Math.PI / 2;
+    const a2 = a1 + Math.PI / 5;
+    ctx.lineTo(Math.cos(a1) * r, Math.sin(a1) * r);
+    ctx.lineTo(Math.cos(a2) * r * 0.45, Math.sin(a2) * r * 0.45);
+  }
+  ctx.closePath();
+  ctx.fill();
+  ctx.restore();
+}
+
+function animateFireworks(){
+  fwCtx.clearRect(0, 0, fwCanvas.width, fwCanvas.height);
+  const now = performance.now();
+  const elapsed = now - celebrationStart;
+
+  if(celebrationActive && now - lastFwSpawn > 420 && elapsed < CELEBRATION_DURATION - 1800 && launchedFireworks < MAX_FIREWORKS){
+    lastFwSpawn = now;
+    launchedFireworks++;
+    const fx = fwCanvas.width * (0.1 + Math.random() * 0.8);
+    const fy = fwCanvas.height * (0.08 + Math.random() * 0.4);
+    launchFirework(fx, fy);
+    playFireworkBoom();
+  }
+
+  fwCtx.globalCompositeOperation = 'lighter';
+  for(let i = particles.length - 1; i >= 0; i--){
+    const p = particles[i];
+    if(p.flash){
+      p.life -= p.decay;
+      if(p.life <= 0){ particles.splice(i,1); continue; }
+      const r = p.size * (1 - p.life) * 1.6;
+      const grad = fwCtx.createRadialGradient(p.x, p.y, 0, p.x, p.y, r);
+      grad.addColorStop(0, `hsla(${p.hue},100%,95%,${p.life})`);
+      grad.addColorStop(1, `hsla(${p.hue},100%,60%,0)`);
+      fwCtx.fillStyle = grad;
+      fwCtx.beginPath();
+      fwCtx.arc(p.x, p.y, r, 0, Math.PI * 2);
+      fwCtx.fill();
+      continue;
+    }
+    p.x += p.vx; p.y += p.vy;
+    p.vy += 0.07; p.vx *= 0.985; p.vy *= 0.985;
+    p.life -= p.decay;
+    if(p.life <= 0){ particles.splice(i,1); continue; }
+    fwCtx.fillStyle = `hsla(${p.hue}, 100%, ${55 + p.life * 25}%, ${p.life})`;
+    fwCtx.beginPath();
+    fwCtx.arc(p.x, p.y, p.size * (0.4 + p.life * 0.7), 0, Math.PI * 2);
+    fwCtx.fill();
+    fwCtx.fillStyle = `hsla(${p.hue}, 100%, 70%, ${p.life * 0.25})`;
+    fwCtx.beginPath();
+    fwCtx.arc(p.x - p.vx * 1.6, p.y - p.vy * 1.6, p.size * 0.4 * p.life, 0, Math.PI * 2);
+    fwCtx.fill();
+  }
+
+  fwCtx.globalCompositeOperation = 'source-over';
+  for(let i = confetti.length - 1; i >= 0; i--){
+    const c = confetti[i];
+    c.wobble += c.wobbleSpeed;
+    c.x += c.vx + Math.sin(c.wobble) * 0.7;
+    c.y += c.vy;
+    c.rot += c.rotSpeed;
+    if(c.y > fwCanvas.height + 40){ confetti.splice(i,1); continue; }
+    if(c.shape === 'star'){
+      drawStar(fwCtx, c.x, c.y, c.w * 0.6, c.color);
+    } else {
+      fwCtx.save();
+      fwCtx.translate(c.x, c.y);
+      fwCtx.rotate(c.rot);
+      const flip = Math.abs(Math.sin(c.wobble * 0.5));
+      fwCtx.scale(1, 0.4 + flip * 0.6);
+      fwCtx.fillStyle = c.color;
+      fwCtx.fillRect(-c.w / 2, -c.h / 2, c.w, c.h);
+      fwCtx.restore();
+    }
+  }
+
+  if(celebrationActive || particles.length > 0 || confetti.length > 0){
+    fwAnimId = requestAnimationFrame(animateFireworks);
+  } else {
+    fwAnimId = null;
+    fwCtx.clearRect(0, 0, fwCanvas.width, fwCanvas.height);
+  }
+}
+
+function startCelebration(){
+  celebrationActive = true;
+  celebrationStart = performance.now();
+  particles = []; confetti = [];
+  launchedFireworks = 0; lastFwSpawn = 0;
+  spawnConfetti(180);
+  const hues = [0, 200, 45];
+  hues.forEach((h, i) => {
+    setTimeout(() => {
+      if(!celebrationActive) return;
+      launchFirework(
+        fwCanvas.width * (0.25 + i * 0.25),
+        fwCanvas.height * (0.15 + Math.random() * 0.25),
+        h
+      );
+      playFireworkBoom();
+    }, i * 120);
+  });
+  if(!fwAnimId) fwAnimId = requestAnimationFrame(animateFireworks);
+}
+
+function stopCelebration(){
+  celebrationActive = false;
+  if(!fwAnimId && (particles.length || confetti.length)){
+    fwAnimId = requestAnimationFrame(animateFireworks);
+  }
+}
+
+function playVictory(){
+  if(!soundEnabled) return;
+  const fanfare = [
+    {f:523.25, t:0.00, d:0.15},
+    {f:523.25, t:0.16, d:0.15},
+    {f:523.25, t:0.32, d:0.15},
+    {f:659.25, t:0.50, d:0.32},
+    {f:783.99, t:0.86, d:0.32},
+    {f:1046.50, t:1.22, d:0.9}
+  ];
+  fanfare.forEach(n => {
+    tone(n.f,     n.t, n.d, 'square',   0.11);
+    tone(n.f,     n.t, n.d, 'triangle', 0.08);
+    tone(n.f * 2, n.t, n.d * 0.7, 'sine', 0.04);
+  });
+  setTimeout(() => playApplause(5.2), 200);
+  for(let i = 0; i < 14; i++){
+    const f = 1400 + Math.random() * 1800;
+    tone(f, 1.4 + i * 0.06, 0.14, 'sine', 0.045);
+  }
+}
+
+/* ============================================================
+   FULLSCREEN & SOUND TOGGLE
+============================================================ */
+const fsBtn = document.getElementById('btnFullscreen');
+const fsIcon = document.getElementById('fsIcon');
+const fsLabel = document.getElementById('fsLabel');
+const soundBtn = document.getElementById('btnSound');
+const soundIcon = document.getElementById('soundIcon');
+const soundLabel = document.getElementById('soundLabel');
+
+function isFullscreen(){
+  return !!(document.fullscreenElement || document.webkitFullscreenElement || document.msFullscreenElement);
+}
+function updateFsUI(){
+  if(isFullscreen()){
+    fsIcon.textContent = '⛗'; fsLabel.textContent = 'Keluar FS';
+    fsBtn.title = 'Keluar dari layar penuh (Esc)';
+  } else {
+    fsIcon.textContent = '⛶'; fsLabel.textContent = 'Fullscreen';
+    fsBtn.title = 'Tampilkan layar penuh (tekan F)';
+  }
+}
+async function toggleFullscreen(){
+  try{
+    if(!isFullscreen()){
+      const el = document.documentElement;
+      if(el.requestFullscreen) await el.requestFullscreen();
+      else if(el.webkitRequestFullscreen) await el.webkitRequestFullscreen();
+      else if(el.msRequestFullscreen) await el.msRequestFullscreen();
+    } else {
+      if(document.exitFullscreen) await document.exitFullscreen();
+      else if(document.webkitExitFullscreen) await document.webkitExitFullscreen();
+      else if(document.msExitFullscreen) await document.msExitFullscreen();
+    }
+  }catch(err){ console.warn('Fullscreen gagal:', err); }
+  updateFsUI();
+}
+fsBtn.addEventListener('click', toggleFullscreen);
+['fullscreenchange','webkitfullscreenchange','msfullscreenchange'].forEach(evt => {
+  document.addEventListener(evt, updateFsUI);
+});
+
+function updateSoundUI(){
+  if(soundEnabled){
+    soundIcon.textContent = '🔊'; soundLabel.textContent = 'Suara';
+    soundBtn.classList.remove('muted');
+    soundBtn.title = 'Matikan suara (tekan M)';
+  } else {
+    soundIcon.textContent = '🔇'; soundLabel.textContent = 'Bisu';
+    soundBtn.classList.add('muted');
+    soundBtn.title = 'Hidupkan suara (tekan M)';
+  }
+}
+function toggleSound(){
+  soundEnabled = !soundEnabled;
+  updateSoundUI();
+  if(soundEnabled) playTick();
+}
+soundBtn.addEventListener('click', toggleSound);
+
+document.addEventListener('keydown', (e)=>{
+  const tag = (e.target && e.target.tagName) || '';
+  if(tag === 'INPUT' || tag === 'SELECT' || tag === 'TEXTAREA') return;
+  if(e.ctrlKey || e.metaKey || e.altKey) return;
+  if(e.key === 'f' || e.key === 'F'){ e.preventDefault(); toggleFullscreen(); }
+  if(e.key === 'm' || e.key === 'M'){ e.preventDefault(); toggleSound(); }
+});
+
+updateFsUI();
+updateSoundUI();
+
+/* ============================================================
+   SETUP SCREEN
+============================================================ */
+const teamGrid = document.getElementById('teamGrid');
+TEAMS.forEach(t => {
+  const div = document.createElement('div');
+  div.className = 'team-card ' + t.cls;
+  div.innerHTML = `<div class="flag">🚩</div><input type="text" value="${t.name}" data-id="${t.id}" maxlength="16">`;
+  teamGrid.appendChild(div);
+});
+teamGrid.querySelectorAll('input').forEach(inp => {
+  inp.addEventListener('input', () => {
+    const t = TEAMS.find(x=>x.id===inp.dataset.id);
+    t.name = inp.value || t.id;
+    renderScoreboard();
+    populateTeamSelects();
+  });
+});
+
+const selTeam1 = document.getElementById('selTeam1');
+const selTeam2 = document.getElementById('selTeam2');
+function populateTeamSelects(){
+  const v1 = selTeam1.value || 'A', v2 = selTeam2.value || 'B';
+  selTeam1.innerHTML = TEAMS.map(t=>`<option value="${t.id}">${t.name}</option>`).join('');
+  selTeam2.innerHTML = TEAMS.map(t=>`<option value="${t.id}">${t.name}</option>`).join('');
+  selTeam1.value = v1; selTeam2.value = v2;
+}
+selTeam1.addEventListener('change', () => { if(selTeam1.value===selTeam2.value) autoFixTeam2(); });
+selTeam2.addEventListener('change', () => { if(selTeam1.value===selTeam2.value) autoFixTeam1(); });
+function autoFixTeam2(){ const other = TEAMS.find(t=>t.id!==selTeam1.value); selTeam2.value = other.id; }
+function autoFixTeam1(){ const other = TEAMS.find(t=>t.id!==selTeam2.value); selTeam1.value = other.id; }
+populateTeamSelects();
+selTeam2.value = 'B';
+
+function renderScoreboard(){
+  const board = document.getElementById('scoreboard');
+  board.innerHTML = TEAMS.map(t => `<div class="score-chip"><span class="dot" style="background:${t.color}"></span>${t.name}: <b>${wins[t.id]}</b></div>`).join('');
+}
+renderScoreboard();
+
+/* ===================== MODE SELECTOR ===================== */
+let gameMode = 'serentak';
+function buildRulesText(){
+  const s = getCustomSettings();
+  if(gameMode === 'serentak'){
+    return `📜 <b>Mode Serentak:</b> Ronde ini berisi <b>${s.qCount} soal</b> dengan waktu <b>${s.perQSec} detik/soal</b> (total ≈ ${s.totalMinActual} menit). Soal tampil <b>di tengah</b>, panel jawaban Tim 1 di <b>kiri</b>, Tim 2 di <b>kanan</b>. Kedua tim boleh menjawab <b>kapan saja</b>. Begitu satu tim menjawab <b>benar</b>, soal selesai dan bendera bergeser ke arah mereka. Jika salah, panelnya terkunci dan <b style="color:#fbbf24">jawaban benar TIDAK ditampilkan dulu</b>. Kunci jawaban baru muncul setelah <b>kedua tim selesai menjawab</b> atau <b>waktu habis</b>. Tim yang menarik bendera sampai batas menang seketika. Jika soal habis, posisi bendera paling menguntungkan yang menang.`;
+  } else {
+    return `📜 <b>Mode Bel:</b> Ronde ini berisi <b>${s.qCount} soal</b> dengan waktu <b>${s.perQSec} detik/soal</b> (total ≈ ${s.totalMinActual} menit). Soal tampil di tengah, tombol bel Tim 1 di kiri dan Tim 2 di kanan. Tim <b>menekan bel secepat mungkin</b>. Yang lebih dulu menekan bel mendapat <b>${s.perQSec} detik</b> menjawab sendirian. Jawaban <b>benar</b> → bendera bergeser ke arah tim tersebut. Jawaban <b>salah/waktu habis</b> → bendera bergeser ke arah lawan. Tim yang menarik bendera sampai batas menang seketika.`;
+  }
+}
+function setMode(m){
+  gameMode = m;
+  document.getElementById('modeCardSerentak').classList.toggle('selected', m==='serentak');
+  document.getElementById('modeCardBel').classList.toggle('selected', m==='bel');
+  document.getElementById('rulesBox').innerHTML = buildRulesText();
+}
+document.getElementById('modeCardSerentak').addEventListener('click', ()=>setMode('serentak'));
+document.getElementById('modeCardBel').addEventListener('click', ()=>setMode('bel'));
+setMode('serentak');
+updateCustomInfo();
+
+/* ===================== ROUND STATE ===================== */
+let round = null;
+
+document.getElementById('btnStartRound').addEventListener('click', () => {
+  getAudioCtx();
+  stopCelebration();
+
+  const id1 = selTeam1.value, id2 = selTeam2.value;
+  if(id1 === id2){ alert('Pilih dua tim yang berbeda!'); return; }
+  const t1 = TEAMS.find(t=>t.id===id1), t2 = TEAMS.find(t=>t.id===id2);
+
+  const settings = getCustomSettings();
+  const qCount      = settings.qCount;
+  const perQSec     = settings.perQSec;
+
+  // Boundary auto-scale: rasio 15 soal → 6 langkah
+  const boundary = Math.max(3, Math.round(qCount / 2.5));
+
+  round = {
+    team1:t1, team2:t2,
+    position:0,
+    boundary: boundary,
+    mode:gameMode,
+    qCount: qCount,
+    perQSec: perQSec,
+    totalSec: perQSec * qCount,
+    questions: prepareRoundQuestions(qCount),
+    qIndex:0,
+    timerInterval:null, timeLeft:0, questionStart:0,
+    buzzedTeam:null, locked:false,
+    locked1:false, locked2:false, decided:false, optSet1:null, optSet2:null,
+    activeOptions:null, lastTickSec:99
+  };
+  document.getElementById('screen-setup').classList.add('hidden');
+  document.getElementById('screen-game').classList.remove('hidden');
+  document.getElementById('modeTag').textContent =
+    (gameMode==='serentak' ? '⚡ Serentak' : '🔔 Bel') + ' · ' + qCount + ' soal · ' + perQSec + ' dtk/soal';
+
+  const layout = document.getElementById('gameLayout');
+  layout.classList.remove('mode-serentak','mode-bel');
+  layout.classList.add(gameMode==='serentak' ? 'mode-serentak' : 'mode-bel');
+  document.getElementById('leftSerentak').classList.toggle('hidden', gameMode!=='serentak');
+  document.getElementById('rightSerentak').classList.toggle('hidden', gameMode!=='serentak');
+  document.getElementById('leftBel').classList.toggle('hidden', gameMode!=='bel');
+  document.getElementById('rightBel').classList.toggle('hidden', gameMode!=='bel');
+  document.getElementById('belAnswerArea').classList.add('hidden');
+
+  setupTrackVisuals();
+  loadQuestion();
+});
+
+function setupTrackVisuals(){
+  const t1 = round.team1, t2 = round.team2;
+  document.getElementById('pillTeam1').textContent = t1.name;
+  document.getElementById('pillTeam1').style.background = t1.color;
+  document.getElementById('pillTeam2').textContent = t2.name;
+  document.getElementById('pillTeam2').style.background = t2.color;
+  document.getElementById('labelLeft').textContent = '⟵ ' + t1.name;
+  document.getElementById('labelRight').textContent = t2.name + ' ⟶';
+  document.getElementById('zoneLeft').style.background = t1.color;
+  document.getElementById('zoneRight').style.background = t2.color;
+  document.getElementById('buzzLabel1').textContent = t1.name;
+  document.getElementById('buzzLabel2').textContent = t2.name;
+  document.getElementById('buzzBtn1').style.background = t1.color;
+  document.getElementById('buzzBtn2').style.background = t2.color;
+  document.getElementById('panelName1').textContent = t1.name;
+  document.getElementById('panelName1').style.background = t1.color;
+  document.getElementById('panelName2').textContent = t2.name;
+  document.getElementById('panelName2').style.background = t2.color;
+  document.getElementById('panelTeam1').style.borderColor = t1.color;
+  document.getElementById('panelTeam2').style.borderColor = t2.color;
+
+  const ticks = document.getElementById('trackTicks');
+  ticks.innerHTML = '';
+  for(let i=0;i<13;i++){ const d=document.createElement('div'); d.className='track-tick'; ticks.appendChild(d); }
+
+  updateFlagPosition();
+}
+
+function updateFlagPosition(){
+  const pct = 50 + (round.position / round.boundary) * 40;
+  document.getElementById('flagMarker').style.left = pct + '%';
+}
+
+/* ===================== QUESTION FLOW ===================== */
+function loadQuestion(){
+  if(round.qIndex >= round.questions.length){ endRoundByPosition(); return; }
+  clearInterval(round.timerInterval);
+
+  const q = round.questions[round.qIndex];
+  document.getElementById('questionText').textContent = q.text;
+  document.getElementById('qCounter').textContent = `Soal ${round.qIndex+1} / ${round.questions.length}`;
+  document.getElementById('feedbackBox').textContent = '';
+  document.getElementById('btnNext').classList.add('hidden');
+  document.getElementById('timerBar').style.width = '100%';
+
+  round.lastTickSec = 99;
+  if(round.mode === 'bel') loadQuestionBel(q); else loadQuestionSerentak(q);
+}
+
+/* ---------- BEL MODE ---------- */
+function loadQuestionBel(q){
+  round.buzzedTeam = null; round.locked = false;
+  document.getElementById('belAnswerArea').classList.add('hidden');
+  document.getElementById('turnBanner').textContent = '';
+  document.getElementById('buzzBtn1').disabled = false;
+  document.getElementById('buzzBtn2').disabled = false;
+
+  const options = shuffledOptionSet(q);
+  round.activeOptions = options;
+  const optsGrid = document.getElementById('optsGrid');
+  optsGrid.innerHTML = options.map((o,i) => `<button class="opt-btn" data-idx="${i}" disabled>${String.fromCharCode(65+i)}. ${o.text}</button>`).join('');
+}
+document.getElementById('buzzBtn1').addEventListener('click', () => onBuzz(1));
+document.getElementById('buzzBtn2').addEventListener('click', () => onBuzz(2));
+document.addEventListener('keydown', (e) => {
+  if(!round || round.mode!=='bel' || round.buzzedTeam) return;
+  if(document.getElementById('screen-game').classList.contains('hidden')) return;
+  const tag = (e.target && e.target.tagName) || '';
+  if(tag === 'INPUT' || tag === 'SELECT' || tag === 'TEXTAREA') return;
+  if(e.key.toLowerCase()==='q') onBuzz(1);
+  if(e.key.toLowerCase()==='p') onBuzz(2);
+});
+function onBuzz(slot){
+  if(round.buzzedTeam) return;
+  const team = slot===1 ? round.team1 : round.team2;
+  round.buzzedTeam = team;
+  playBuzz();
+  document.getElementById('buzzBtn1').disabled = true;
+  document.getElementById('buzzBtn2').disabled = true;
+  document.getElementById('belAnswerArea').classList.remove('hidden');
+  document.getElementById('turnBanner').textContent = `🎙️ ${team.name} menjawab! (${round.perQSec} detik)`;
+  document.getElementById('turnBanner').style.color = team.color;
+
+  document.getElementById('optsGrid').querySelectorAll('.opt-btn').forEach(btn => {
+    btn.disabled = false; btn.classList.add('enabled');
+    btn.onclick = () => submitAnswerBel(parseInt(btn.dataset.idx));
+  });
+  startTimer(round.perQSec, () => submitAnswerBel(-1));
+}
+function submitAnswerBel(idx){
+  if(round.locked) return;
+  round.locked = true;
+  clearInterval(round.timerInterval);
+
+  const correctIdx = round.activeOptions.findIndex(o=>o.isCorrect);
+  const isCorrect = idx === correctIdx;
+  const team = round.buzzedTeam;
+  const opponent = (team.id === round.team1.id) ? round.team2 : round.team1;
+
+  document.getElementById('optsGrid').querySelectorAll('.opt-btn').forEach((btn,i) => {
+    btn.disabled = true; btn.onclick = null;
+    if(i===correctIdx) btn.classList.add('correct');
+    if(i===idx && idx!==correctIdx) btn.classList.add('wrong');
+  });
+
+  const dir = (team.id === round.team1.id) ? -1 : 1;
+  if(isCorrect){
+    round.position += dir;
+    playCorrect();
+    setFeedback(`✅ <span style="color:#4ade80">Benar!</span> Bendera bergeser ke arah <b style="color:${team.color}">${team.name}</b>!`);
+  } else {
+    round.position -= dir;
+    playWrong();
+    const msg = idx===-1 ? '⏰ Waktu habis!' : '❌ Jawaban salah!';
+    setFeedback(`${msg} Bendera bergeser ke arah <b style="color:${opponent.color}">${opponent.name}</b>.`);
+  }
+  updateFlagPosition();
+  afterQuestionResolved();
+}
+
+/* ---------- SERENTAK MODE ---------- */
+function loadQuestionSerentak(q){
+  round.locked1 = false; round.locked2 = false; round.decided = false;
+  round.optSet1 = shuffledOptionSet(q);
+  round.optSet2 = shuffledOptionSet(q);
+  document.getElementById('status1').textContent = '';
+  document.getElementById('status2').textContent = '';
+  renderPanel(1, round.optSet1);
+  renderPanel(2, round.optSet2);
+  round.questionStart = performance.now();
+  startTimer(round.perQSec, onSerentakTimeout);
+}
+function renderPanel(slot, options){
+  const grid = document.getElementById('optsGrid'+slot);
+  grid.innerHTML = options.map((o,i) => `<button class="panel-opt-btn" data-idx="${i}">${String.fromCharCode(65+i)}. ${o.text}</button>`).join('');
+  grid.querySelectorAll('.panel-opt-btn').forEach(btn => {
+    btn.onclick = () => onSerentakAnswer(slot, parseInt(btn.dataset.idx));
+  });
+}
+
+function onSerentakAnswer(slot, idx){
+  if(round.decided) return;
+  if(slot===1 && round.locked1) return;
+  if(slot===2 && round.locked2) return;
+  if(slot===1) round.locked1 = true; else round.locked2 = true;
+
+  const team = slot===1 ? round.team1 : round.team2;
+  const otherTeam = (team.id === round.team1.id) ? round.team2 : round.team1;
+  const opts = slot===1 ? round.optSet1 : round.optSet2;
+  const correctIdx = opts.findIndex(o=>o.isCorrect);
+  const isCorrect = idx === correctIdx;
+  const elapsed = ((performance.now() - round.questionStart)/1000).toFixed(1);
+
+  const grid = document.getElementById('optsGrid'+slot);
+  grid.querySelectorAll('.panel-opt-btn').forEach((btn,i) => {
+    btn.disabled = true;
+    if(i === idx){ btn.classList.add(isCorrect ? 'correct' : 'wrong'); }
+  });
+  document.getElementById('status'+slot).innerHTML = isCorrect
+    ? `✅ Benar! (${elapsed} detik)`
+    : `❌ Salah (${elapsed} detik)`;
+  document.getElementById('status'+slot).style.color = isCorrect ? '#4ade80' : '#f87171';
+
+  if(isCorrect){
+    round.decided = true;
+    clearInterval(round.timerInterval);
+    playCorrect();
+    const dir = (team.id === round.team1.id) ? -1 : 1;
+    round.position += dir;
+    updateFlagPosition();
+    lockOtherPanel(slot);
+    revealCorrectAnswers();
+    setFeedback(`🏆 <b style="color:${team.color}">${team.name}</b> benar lebih dulu (${elapsed} detik)! Bendera bergeser ke arah mereka.`);
+    afterQuestionResolved();
+    return;
+  }
+
+  playWrong();
+
+  if(round.locked1 && round.locked2){
+    round.decided = true;
+    clearInterval(round.timerInterval);
+    revealCorrectAnswers();
+    setFeedback('⚖️ Kedua tim menjawab salah — bendera tidak bergeser. Jawaban benar ditampilkan.');
+    afterQuestionResolved();
+  } else {
+    setFeedback(`❌ <b style="color:${team.color}">${team.name}</b> salah. <b style="color:${otherTeam.color}">${otherTeam.name}</b> masih bisa menjawab — jawaban benar dirahasiakan sampai selesai!`);
+  }
+}
+
+function revealCorrectAnswers(){
+  [1,2].forEach(slot => {
+    const opts = slot===1 ? round.optSet1 : round.optSet2;
+    if(!opts) return;
+    const correctIdx = opts.findIndex(o=>o.isCorrect);
+    const grid = document.getElementById('optsGrid'+slot);
+    grid.querySelectorAll('.panel-opt-btn').forEach((btn,i) => {
+      btn.disabled = true;
+      if(i === correctIdx && !btn.classList.contains('wrong')){
+        btn.classList.add('correct');
+      }
+    });
+  });
+}
+
+function lockOtherPanel(winnerSlot){
+  const loserSlot = winnerSlot===1 ? 2 : 1;
+  if((loserSlot===1 && !round.locked1) || (loserSlot===2 && !round.locked2)){
+    const grid = document.getElementById('optsGrid'+loserSlot);
+    grid.querySelectorAll('.panel-opt-btn').forEach(btn => btn.disabled = true);
+    document.getElementById('status'+loserSlot).innerHTML = '⌛ Kalah cepat!';
+    document.getElementById('status'+loserSlot).style.color = '#b8b3e6';
+    if(loserSlot===1) round.locked1 = true; else round.locked2 = true;
+  }
+}
+
+function onSerentakTimeout(){
+  if(round.decided) return;
+  round.decided = true;
+  clearInterval(round.timerInterval);
+  [1,2].forEach(slot => {
+    const locked = slot===1 ? round.locked1 : round.locked2;
+    if(!locked){
+      document.getElementById('optsGrid'+slot).querySelectorAll('.panel-opt-btn').forEach(btn => btn.disabled = true);
+      document.getElementById('status'+slot).innerHTML = '⏰ Waktu habis';
+      document.getElementById('status'+slot).style.color = '#b8b3e6';
+    }
+  });
+  revealCorrectAnswers();
+  setFeedback('⏰ Waktu habis — jawaban benar ditampilkan. Bendera tidak bergeser.');
+  afterQuestionResolved();
+}
+
+/* ---------- SHARED HELPERS ---------- */
+function startTimer(seconds, onExpire){
+  round.timeLeft = seconds;
+  round.lastTickSec = Math.ceil(seconds);
+  const bar = document.getElementById('timerBar');
+  bar.style.width = '100%';
+  round.timerInterval = setInterval(() => {
+    round.timeLeft -= 0.1;
+    bar.style.width = Math.max(0, (round.timeLeft/seconds*100)) + '%';
+
+    const secLeft = Math.ceil(round.timeLeft);
+    if(secLeft !== round.lastTickSec){
+      round.lastTickSec = secLeft;
+      // Tik hanya untuk 5 detik terakhir
+      if(secLeft <= 5 && secLeft >= 1) playTick();
+    }
+
+    if(round.timeLeft <= 0){ clearInterval(round.timerInterval); onExpire(); }
+  }, 100);
+}
+function setFeedback(html){ document.getElementById('feedbackBox').innerHTML = html; }
+
+function afterQuestionResolved(){
+  if(round.position <= -round.boundary || round.position >= round.boundary){
+    setTimeout(() => {
+      const winner = round.position <= -round.boundary ? round.team1 : round.team2;
+      showRoundEnd(winner, 'Berhasil menarik bendera sampai ke batas garis kemenangan!');
+    }, 900);
+    return;
+  }
+  round.qIndex++;
+  if(round.qIndex >= round.questions.length){
+    setTimeout(() => endRoundByPosition(), 900);
+    return;
+  }
+  document.getElementById('btnNext').classList.remove('hidden');
+}
+document.getElementById('btnNext').addEventListener('click', loadQuestion);
+
+function endRoundByPosition(){
+  if(round.position === 0){
+    setFeedback('⚖️ Skor imbang setelah semua soal! Satu soal tambahan (sudden death)...');
+    round.questions.push(prepareRoundQuestions(1)[0]);
+    round.qIndex = round.questions.length - 1;
+    setTimeout(loadQuestion, 1400);
+    return;
+  }
+  const winner = round.position < 0 ? round.team1 : round.team2;
+  showRoundEnd(winner, `Ronde selesai setelah ${round.qCount} soal — posisi bendera paling menguntungkan menentukan pemenang.`);
+}
+function showRoundEnd(winner, subtitle){
+  wins[winner.id]++;
+  renderScoreboard();
+
+  playVictory();
+  startCelebration();
+
+  document.getElementById('winnerText').textContent = `${winner.name} Menang!`;
+  document.getElementById('winnerText').style.color = winner.color;
+  document.getElementById('winnerSub').textContent = subtitle;
+  document.getElementById('modalRoundEnd').classList.remove('hidden');
+}
+document.getElementById('btnNewRound').addEventListener('click', () => {
+  stopCelebration();
+  document.getElementById('modalRoundEnd').classList.add('hidden');
+  document.getElementById('screen-game').classList.add('hidden');
+  document.getElementById('screen-setup').classList.remove('hidden');
+  populateTeamSelects();
+});
+
+/* ===================== INIT ===================== */
+['click','touchstart','keydown'].forEach(evt => {
+  document.addEventListener(evt, function resumeOnce(){
+    getAudioCtx();
+    ['click','touchstart','keydown'].forEach(e => document.removeEventListener(e, resumeOnce));
+  }, { once: true });
+});
+</script>
+</body>
+</html>
